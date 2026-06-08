@@ -1,0 +1,305 @@
+```html
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tejidos con Amor - Mi Catálogo de Ventas</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Playfair Display & Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        wool: {
+                            50: '#fbf8f5',
+                            100: '#f5ebe2',
+                            200: '#ebd8c5',
+                            300: '#ddbea8',
+                            400: '#cd9f80',
+                            500: '#be835e',
+                            600: '#b0704c',
+                            700: '#925a3c',
+                            800: '#764a33',
+                            900: '#603e2c',
+                        },
+                        sage: {
+                            50: '#f4f7f5',
+                            100: '#e4ebe6',
+                            200: '#cbdbcf',
+                            300: '#a7c3ae',
+                            400: '#7fa488',
+                            500: '#608669',
+                            600: '#4b6b53',
+                            700: '#3e5644',
+                        }
+                    },
+                    fontFamily: {
+                        serif: ['Playfair Display', 'serif'],
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        html {
+            scroll-behavior: smooth;
+        }
+        .wool-pattern {
+            background-color: #fbf8f5;
+            background-image: radial-gradient(#ebd8c5 1.5px, transparent 1.5px), radial-gradient(#ebd8c5 1.5px, #fbf8f5 1.5px);
+            background-size: 60px 60px;
+            background-position: 0 0, 30px 30px;
+        }
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #fbf8f5;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cd9f80;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #be835e;
+        }
+        /* Animación para el checkmark temporal */
+        @keyframes scaleCheck {
+            0% { transform: scale(0) rotate(-45deg); opacity: 0; }
+            70% { transform: scale(1.2) rotate(0deg); opacity: 1; }
+            100% { transform: scale(1) rotate(0deg); opacity: 1; }
+        }
+        .animate-check {
+            animation: scaleCheck 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+    </style>
+</head>
+<body class="wool-pattern text-slate-800 font-sans min-h-screen flex flex-col">
+
+    <!-- Notificaciones flotantes (Custom Toast) -->
+    <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none"></div>
+
+    <!-- Navegación -->
+    <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md shadow-sm border-b border-wool-100 transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                <!-- Logotipo -->
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 rounded-full bg-wool-100 flex items-center justify-center text-wool-600 shadow-inner">
+                        <i class="fa-solid fa-yarn text-2xl animate-pulse"></i>
+                    </div>
+                    <div>
+                        <span class="font-serif text-2xl font-bold text-wool-800 tracking-wide">Tejidos con Amor</span>
+                        <p class="text-xs text-wool-500 font-medium tracking-widest uppercase">Hecho a mano ✨</p>
+                    </div>
+                </div>
+
+                <!-- Enlaces de navegación rápida -->
+                <nav class="hidden md:flex items-center gap-8 font-medium text-slate-600">
+                    <a href="#hero" class="hover:text-wool-600 transition-colors">Inicio</a>
+                    <a href="#catalogo" class="hover:text-wool-600 transition-colors">Catálogo de Productos</a>
+                </nav>
+
+                <!-- Acciones / Carrito y Botón Administradora -->
+                <div class="flex items-center gap-4">
+                    <!-- Botón de Modo Administradora -->
+                    <button id="admin-btn" onclick="handleAdminBtnClick()" class="text-xs bg-wool-100 hover:bg-wool-200 text-wool-800 py-2.5 px-4 rounded-full font-bold transition-all flex items-center gap-2 shadow-sm border border-wool-200">
+                        <i class="fa-solid fa-lock-open text-sm" id="admin-icon"></i>
+                        <span id="admin-text">Modo Administradora</span>
+                    </button>
+
+                    <!-- Botón Carrito / Las Césticas -->
+                    <button onclick="toggleCartDrawer()" class="relative p-3 bg-wool-600 hover:bg-wool-700 text-white rounded-full transition-all shadow-md hover:shadow-lg flex items-center justify-center">
+                        <i class="fa-solid fa-shopping-basket text-lg"></i>
+                        <span id="cart-badge" class="absolute -top-1 -right-1 bg-rose-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold hidden">0</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Héroe Principal Centrado -->
+    <section id="hero" class="relative py-20 overflow-hidden">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center space-y-8">
+            <div class="space-y-4">
+                <h1 class="font-serif text-5xl sm:text-6xl font-extrabold text-wool-900 leading-tight animate-fadeIn">
+                    Tejidos con Amor
+                </h1>
+                <div class="w-24 h-1 bg-wool-400 mx-auto rounded-full"></div>
+            </div>
+            
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="#catalogo" class="px-10 py-4 bg-wool-600 hover:bg-wool-700 text-white rounded-full font-bold shadow-lg shadow-wool-200 hover:shadow-xl hover:shadow-wool-300 transition-all text-center">
+                    Ver Catálogo
+                </a>
+            </div>
+            
+            <div class="pt-6 flex justify-center border-t border-wool-200/60 max-w-xs mx-auto">
+                <div class="text-center">
+                    <p class="text-3xl font-serif font-bold text-wool-800">100%</p>
+                    <p class="text-xs text-slate-500 font-medium uppercase tracking-wider">Hecho a mano</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Modal para Contraseña de Administradora -->
+    <div id="password-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs hidden">
+        <div class="bg-white rounded-3xl max-w-sm w-full p-6 sm:p-8 shadow-2xl border border-wool-100 relative">
+            <button onclick="closePasswordModal()" class="absolute top-4 right-4 p-1.5 text-slate-400 hover:text-slate-600 rounded-full hover:bg-slate-100">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div class="text-center space-y-4">
+                <div class="w-14 h-14 bg-wool-100 rounded-full flex items-center justify-center text-wool-600 text-2xl mx-auto">
+                    <i class="fa-solid fa-key"></i>
+                </div>
+                <div>
+                    <h3 class="font-serif text-xl font-bold text-wool-900">Acceso Restringido</h3>
+                    <p class="text-xs text-slate-500 mt-1">Ingresa la contraseña de administradora para administrar la tienda.</p>
+                </div>
+                <form onsubmit="verifyAdminPassword(event)" class="space-y-4 pt-2">
+                    <input id="admin-pass-input" type="password" placeholder="Contraseña de Administradora" class="w-full text-center tracking-wide bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-lg font-bold focus:outline-none focus:ring-2 focus:ring-wool-500" required>
+                    <div class="flex gap-3">
+                        <button type="button" onclick="closePasswordModal()" class="w-1/2 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold text-sm transition-all">
+                            Cancelar
+                        </button>
+                        <button type="submit" class="w-1/2 py-2.5 bg-wool-600 hover:bg-wool-700 text-white rounded-xl font-bold text-sm transition-all">
+                            Entrar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Panel de Administración (Protegido por contraseña 'Ariana') -->
+    <section id="admin-panel" class="py-8 bg-wool-100/60 border-y border-wool-200 hidden transition-all duration-300">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="bg-white rounded-3xl p-6 sm:p-8 shadow-md border border-wool-200">
+                
+                <!-- Encabezado del Panel -->
+                <div class="flex items-center justify-between border-b border-wool-100 pb-4 mb-6">
+                    <div class="flex items-center gap-2 text-slate-800">
+                        <i class="fa-solid fa-screwdriver-wrench text-xl text-wool-600"></i>
+                        <h3 class="font-serif text-xl font-bold">Panel de Control General</h3>
+                    </div>
+                    <button onclick="lockAdminMode()" class="text-xs text-rose-600 bg-rose-50 hover:bg-rose-100 px-3 py-1.5 rounded-full font-bold transition-all">
+                        <i class="fa-solid fa-lock mr-1"></i> Cerrar Admin
+                    </button>
+                </div>
+
+                <!-- Tres Botoneras Principales (Pestañas) -->
+                <div class="grid grid-cols-3 gap-2 sm:gap-4 mb-8">
+                    <button onclick="switchAdminTab('publish')" id="tab-btn-publish" class="py-3 px-2 sm:px-4 rounded-xl font-bold text-xs sm:text-sm flex flex-col sm:flex-row items-center justify-center gap-2 transition-all bg-wool-600 text-white shadow-sm">
+                        <i class="fa-solid fa-upload text-sm sm:text-base"></i>
+                        <span>Publicación</span>
+                    </button>
+                    <button onclick="switchAdminTab('bank')" id="tab-btn-bank" class="py-3 px-2 sm:px-4 rounded-xl font-bold text-xs sm:text-sm flex flex-col sm:flex-row items-center justify-center gap-2 transition-all bg-slate-50 text-slate-700 hover:bg-slate-100 border border-slate-200">
+                        <i class="fa-solid fa-building-columns text-sm sm:text-base"></i>
+                        <span>Cuenta Bancaria</span>
+                    </button>
+                    <button onclick="switchAdminTab('delete')" id="tab-btn-delete" class="py-3 px-2 sm:px-4 rounded-xl font-bold text-xs sm:text-sm flex flex-col sm:flex-row items-center justify-center gap-2 transition-all bg-slate-50 text-slate-700 hover:bg-slate-100 border border-slate-200">
+                        <i class="fa-solid fa-trash text-sm sm:text-base"></i>
+                        <span>Eliminar</span>
+                    </button>
+                </div>
+
+                <!-- SECCIÓN 1: Formulario de Publicación -->
+                <div id="admin-tab-publish" class="admin-tab-content space-y-4">
+                    <h4 class="font-serif font-bold text-lg text-wool-900 border-b border-wool-100 pb-2">📝 Publicar una Nueva Creación</h4>
+                    <form id="add-product-form" onsubmit="addNewProduct(event)" class="space-y-4">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Nombre del tejido</label>
+                                <input id="prod-name" type="text" placeholder="Ej. Llavero de Jirafita Tejida" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-wool-500" required>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Precio (en Dólares USD)</label>
+                                <input id="prod-price" type="number" step="0.01" placeholder="Ej. 15.00" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-wool-500" required>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <!-- Foto de la Galería -->
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Foto del Tejido (Desde tu Galería)</label>
+                                <label class="flex flex-col items-center justify-center w-full h-11 bg-slate-50 border border-slate-200 rounded-xl cursor-pointer hover:bg-wool-50 transition-colors">
+                                    <div class="flex items-center gap-2 text-xs font-semibold text-slate-600 px-4">
+                                        <i class="fa-solid fa-image text-wool-600"></i>
+                                        <span id="image-file-label">Seleccionar Foto 📸</span>
+                                    </div>
+                                    <input id="prod-image-file" type="file" accept="image/*" class="hidden" onchange="updateFileLabel(this, 'image-file-label', 'Foto seleccionada')" required>
+                                </label>
+                            </div>
+                            <!-- Video de la Galería -->
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Video del Tejido (Desde tu Galería - Opcional)</label>
+                                <label class="flex flex-col items-center justify-center w-full h-11 bg-slate-50 border border-slate-200 rounded-xl cursor-pointer hover:bg-wool-50 transition-colors">
+                                    <div class="flex items-center gap-2 text-xs font-semibold text-slate-600 px-4">
+                                        <i class="fa-solid fa-circle-play text-wool-600"></i>
+                                        <span id="video-file-label">Seleccionar Video 🎥</span>
+                                    </div>
+                                    <input id="prod-video-file" type="file" accept="video/*" class="hidden" onchange="updateFileLabel(this, 'video-file-label', 'Video seleccionado')">
+                                </label>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Descripción detallada</label>
+                            <textarea id="prod-desc" rows="2" placeholder="Describe el material, colores, cuidados específicos y tamaño aproximado del tejido..." class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-wool-500" required></textarea>
+                        </div>
+
+                        <div class="pt-2 flex justify-end">
+                            <button type="submit" class="px-8 py-3 bg-wool-600 hover:bg-wool-700 text-white rounded-xl font-bold transition-all text-sm flex items-center gap-2">
+                                <i class="fa-solid fa-paper-plane"></i> Publicar Tejido
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- SECCIÓN 2: Modificar Cuenta Bancaria de Venezuela (USD) -->
+                <div id="admin-tab-bank" class="admin-tab-content space-y-4 hidden">
+                    <h4 class="font-serif font-bold text-lg text-wool-900 border-b border-wool-100 pb-2">🏦 Datos de Cuenta para Recibir Dinero</h4>
+                    <p class="text-xs text-slate-500">Configura tus datos de Pago Móvil o cuenta en dólares. Los clientes depositarán a esta cuenta y los pedidos se enviarán al teléfono que registres aquí.</p>
+                    
+                    <form id="bank-settings-form" onsubmit="saveBankSettings(event)" class="space-y-4">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Banco / Plataforma de Pago (Venezuela)</label>
+                                <input id="bank-name" type="text" placeholder="Ej. Pago Móvil (Banesco), Zelle, PayPal" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-wool-500" required>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Tipo de Pago o Instrumento</label>
+                                <input id="bank-type" type="text" placeholder="Ej. Pago Móvil, Correo Electrónico, Transferencia" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-wool-500" required>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Número de Cuenta, Pago Móvil o Email de Recepción</label>
+                                <input id="bank-number" type="text" placeholder="Ej. Teléfono del Pago Móvil o Correo Zelle" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-wool-500" required>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Titular del Pago Móvil o Cuenta (Nombre completo)</label>
+                                <input id="bank-owner" type="text" placeholder="Ej. Ariana Gómez" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-wool-500" required>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Cédula de Identidad del Titular (V- / E-)</label>
+                                <input id="bank-id" type="text" placeholder="Ej. V-12.345.678" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-wool-500" required>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Teléfono de WhatsApp del Negocio (Donde llegarán los pedidos 📲)</label>
+    
